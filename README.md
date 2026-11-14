@@ -49,6 +49,17 @@ Installation is performed by a Muse agent, not manually:
 After installation, the setup is self-maintaining: reboots and VM
 replacements recover automatically.
 
+## Deployment notes (detailed, in Chinese)
+
+For a step-by-step deployment record based on a real install — exact
+versions, verification commands with expected output, and the pitfalls
+hit along the way (including version drift and the Cloudflare Tunnel
+timeout) — see [docs/deployment.md](docs/deployment.md)（中文部署说明）.
+A Postman collection for testing the API Bridge lives in
+[postman/muse-bridge.postman_collection.json](postman/muse-bridge.postman_collection.json);
+fill in its `baseUrl` and `bridge_token` variables with your own values
+before use (never commit a real key).
+
 ## How it works
 
 ### Nix

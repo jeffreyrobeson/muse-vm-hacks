@@ -1,0 +1,123 @@
+{
+  "auth": {
+    "bearer": [
+      {
+        "key": "token",
+        "type": "string",
+        "value": "{{bridge_token}}"
+      }
+    ],
+    "type": "bearer"
+  },
+  "info": {
+    "description": "Test the Muse API Bridge on muse-vm over Tailscale. Run Postman on a device already joined to the same Tailnet. Set the collection variables baseUrl and bridge_token before sending.",
+    "name": "Muse API Bridge",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health check",
+      "request": {
+        "description": "No auth needed. Expect {\"status\": \"ok\"}.",
+        "method": "GET",
+        "url": "{{baseUrl}}/health"
+      }
+    },
+    {
+      "name": "List models",
+      "request": {
+        "auth": {
+          "bearer": [
+            {
+              "key": "token",
+              "type": "string",
+              "value": "{{bridge_token}}"
+            }
+          ],
+          "type": "bearer"
+        },
+        "description": "Expect one model with id \"muse\".",
+        "method": "GET",
+        "url": "{{baseUrl}}/v1/models"
+      }
+    },
+    {
+      "name": "Chat completions",
+      "request": {
+        "auth": {
+          "bearer": [
+            {
+              "key": "token",
+              "type": "string",
+              "value": "{{bridge_token}}"
+            }
+          ],
+          "type": "bearer"
+        },
+        "body": {
+          "mode": "raw",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          },
+          "raw": "{\n  \"model\": \"muse\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"Reply with exactly the word BridgeOK and nothing else.\"\n    }\n  ]\n}"
+        },
+        "description": "Answer is in choices[0].message.content. Usage fields are always 0. Server waits up to 600s for the agent turn; simple requests take seconds, complex ones take minutes.",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "method": "POST",
+        "url": "{{baseUrl}}/v1/chat/completions"
+      }
+    },
+    {
+      "name": "Chat completions (stream)",
+      "request": {
+        "auth": {
+          "bearer": [
+            {
+              "key": "token",
+              "type": "string",
+              "value": "{{bridge_token}}"
+            }
+          ],
+          "type": "bearer"
+        },
+        "body": {
+          "mode": "raw",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          },
+          "raw": "{\n  \"model\": \"muse\",\n  \"stream\": true,\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"用一句话介绍一下你自己。\"\n    }\n  ]\n}"
+        },
+        "description": "Streamed as a single chunk with the full reply, then data: [DONE].",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "method": "POST",
+        "url": "{{baseUrl}}/v1/chat/completions"
+      }
+    }
+  ],
+  "variable": [
+    {
+      "description": "Your Tailnet node name for the Muse VM. If muse-vm does not resolve, use http://<Tailnet IP>:8080 instead.",
+      "key": "baseUrl",
+      "value": "http://muse-vm:8080"
+    },
+    {
+      "description": "Initial API key from ~/bridge/token on the VM. Keep it private; never commit a real key.",
+      "key": "bridge_token",
+      "value": ""
+    }
+  ]
+}
